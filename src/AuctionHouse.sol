@@ -40,7 +40,6 @@ contract AuctionHouse is Ownable, IAuctionHouse {
     uint256 public immutable minContributionPerTick;
     uint256 public immutable minTicksPerOrder;
     uint256 public immutable expiration;
-    IERC20 public immutable settlementAsset;
 
     mapping(uint256 => Order) private orders;
     uint256 progressiveOrderId;
@@ -51,13 +50,9 @@ contract AuctionHouse is Ownable, IAuctionHouse {
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    constructor(
-        uint256 _minContributionPerTick,
-        uint256 _minTicksPerOrder,
-        uint256 _expiration,
-        address _settlementAsset,
-        address _owner
-    ) Ownable(_owner) {
+    constructor(uint256 _minContributionPerTick, uint256 _minTicksPerOrder, uint256 _expiration, address _owner)
+        Ownable(_owner)
+    {
         if (_expiration > block.timestamp) {
             revert InValidExpiration();
         }
@@ -68,7 +63,6 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         minContributionPerTick = _minContributionPerTick;
         minTicksPerOrder = _minTicksPerOrder;
         expiration = _expiration;
-        settlementAsset = IERC20(_settlementAsset);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -100,8 +94,6 @@ contract AuctionHouse is Ownable, IAuctionHouse {
             list.pushFront(newOrderId);
             orders[newOrderId] = newOrder;
 
-            settlementAsset.safeTransferFrom(msg.sender, address(this), _amountToPayPerTick * _orderSizeInTicks);
-
             emit Offer(newOrderId, msg.sender);
             return newOrderId;
         }
@@ -129,8 +121,6 @@ contract AuctionHouse is Ownable, IAuctionHouse {
             list.insertBefore(currentOrderId, newOrderId);
         }
         orders[newOrderId] = newOrder;
-
-        settlementAsset.safeTransferFrom(msg.sender, address(this), _amountToPayPerTick * _orderSizeInTicks);
 
         emit Offer(newOrderId, msg.sender);
         return newOrderId;
