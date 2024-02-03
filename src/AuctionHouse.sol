@@ -62,7 +62,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         if (_expiration < block.timestamp) {
             revert InValidExpiration();
         }
-        if (_minTicksPerOrder < MAX_TICKS) {
+        if (_minTicksPerOrder > MAX_TICKS) {
             revert InValidOrderSize();
         }
 
@@ -79,16 +79,16 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         external
         returns (uint256)
     {
-        if (_expiration > block.timestamp) {
+        if (_expiration < block.timestamp) {
             revert ExpiredOrder();
         }
-        if (_orderSizeInTicks >= minTicksPerOrder) {
+        if (_orderSizeInTicks < minTicksPerOrder) {
             revert InValidOrderSize();
         }
-        if (_amountToPayPerTick >= minContributionPerTick) {
+        if (_amountToPayPerTick < minContributionPerTick) {
             revert InvalidAmountToPayPerTick();
         }
-        if (_orderSizeInTicks < MAX_TICKS) {
+        if (_orderSizeInTicks > MAX_TICKS) {
             revert GiantOrder();
         }
 
@@ -161,6 +161,30 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         }
 
         sendMessage(currentOrder);
+    }
+
+    function constructList() external returns (Order[] memory) {
+        Order[] memory ordersList = new Order[](list.sizeOf());
+
+        bool hasNext = true;
+        uint256 counter = 0;
+
+        uint256 currentOrderId = list.popFront();
+        Order memory currentOrder = orders[currentOrderId];
+
+        while (hasNext) {
+            ordersList[counter] = currentOrder;
+
+            (bool hasNextNode, uint256 nextNode) = list.getNextNode(currentOrderId);
+
+            hasNext = hasNextNode;
+            currentOrderId = nextNode;
+            currentOrder = orders[nextNode];
+
+            counter++;
+        }
+
+        return ordersList;
     }
 
     function futureRevenueCertificate(address _frCertificate) external {
