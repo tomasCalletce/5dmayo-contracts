@@ -5,8 +5,6 @@ import "./interfaces/ITeleporterMessenger.sol";
 
 import {IAuctionHouse} from "./interfaces/IAuctionHouse.sol";
 import {StructuredLinkedList} from "./StructuredLinkedList.sol";
-import {SafeERC20} from "@openzeppelin/token/ERC20/utils/SafeERC20.sol";
-import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 import {Ownable} from "@openzeppelin/access/Ownable.sol";
 
 error InValidExpiration();
@@ -22,7 +20,6 @@ error NotWinner();
 
 contract AuctionHouse is Ownable, IAuctionHouse {
     using StructuredLinkedList for StructuredLinkedList.List;
-    using SafeERC20 for IERC20;
 
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
@@ -46,6 +43,8 @@ contract AuctionHouse is Ownable, IAuctionHouse {
     uint256 public immutable minContributionPerTick;
     uint256 public immutable minTicksPerOrder;
     uint256 public immutable expiration;
+
+    uint256 listHead;
 
     address public frCertificate;
 
@@ -100,11 +99,13 @@ contract AuctionHouse is Ownable, IAuctionHouse {
             list.pushFront(newOrderId);
             orders[newOrderId] = newOrder;
 
+            listHead = newOrderId;
+
             emit Offer(newOrderId, msg.sender);
             return newOrderId;
         }
 
-        uint256 currentOrderId = list.popFront();
+        uint256 currentOrderId = listHead;
         Order storage currentOrder = orders[currentOrderId];
 
         bool gotToTheEnd = false;
@@ -121,11 +122,16 @@ contract AuctionHouse is Ownable, IAuctionHouse {
             currentOrder = orders[currentOrderId];
         }
 
+        if (currentOrderId == listHead) {
+            listHead = newOrderId;
+        }
+
         if (gotToTheEnd) {
             list.insertAfter(currentOrderId, newOrderId);
         } else {
             list.insertBefore(currentOrderId, newOrderId);
         }
+
         orders[newOrderId] = newOrder;
 
         emit Offer(newOrderId, msg.sender);
@@ -143,7 +149,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         uint256 ticksConsumed = 0;
         bool hasNext = true;
 
-        uint256 currentOrderId = list.popFront();
+        uint256 currentOrderId = listHead;
         Order memory currentOrder = orders[currentOrderId];
 
         while (hasNext && currentOrderId != orderId) {
@@ -160,16 +166,16 @@ contract AuctionHouse is Ownable, IAuctionHouse {
             revert NotWinner();
         }
 
-        sendMessage(currentOrder);
+        sendMessage(currentOrder, orderId);
     }
 
-    function constructList() external returns (Order[] memory) {
+    function constructList() external view returns (Order[] memory) {
         Order[] memory ordersList = new Order[](list.sizeOf());
 
         bool hasNext = true;
         uint256 counter = 0;
 
-        uint256 currentOrderId = list.popFront();
+        uint256 currentOrderId = listHead;
         Order memory currentOrder = orders[currentOrderId];
 
         while (hasNext) {
@@ -195,8 +201,9 @@ contract AuctionHouse is Ownable, IAuctionHouse {
                               TELEPORTER LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function sendMessage(Order memory order) internal returns (uint256 messageID) {
-        bytes memory message = abi.encode(order);
+    function sendMessage(Order memory order, uint256 orderId) internal returns (uint256 messageID) {
+        bytes memory message = abi.encode(order, orderId);
+
         return uint256(
             teleporterMessenger.sendCrossChainMessage(
                 TeleporterMessageInput({
