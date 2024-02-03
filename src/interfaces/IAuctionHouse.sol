@@ -13,6 +13,4 @@ interface IAuctionHouse {
     function offer(uint256 _amountToPayPerTick, uint256 _orderSizeInTicks, address _receiver, uint256 _expiration)
         external
         returns (uint256);
-
-    function settleAuction() external;
 }

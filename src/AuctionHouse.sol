@@ -148,7 +148,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         uint256 currentOrderId = list.popFront();
         Order memory currentOrder = orders[currentOrderId];
 
-        while (hasNext && currentOrder != orderId) {
+        while (hasNext && currentOrderId != orderId) {
             ticksConsumed += currentOrder.orderSizeInTicks;
 
             (bool hasNextNode, uint256 nextNode) = list.getNextNode(currentOrderId);
@@ -162,7 +162,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
             revert NotWinner();
         }
 
-        sendMessage(order);
+        sendMessage(currentOrder);
     }
 
     /*//////////////////////////////////////////////////////////////
