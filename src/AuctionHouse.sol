@@ -61,7 +61,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
     constructor(uint256 _minContributionPerTick, uint256 _minTicksPerOrder, uint256 _expiration, address _owner)
         Ownable(_owner)
     {
-        if (_expiration > block.timestamp) {
+        if (_expiration < block.timestamp) {
             revert InValidExpiration();
         }
         if (_minTicksPerOrder < MAX_TICKS) {
@@ -90,7 +90,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         if (_amountToPayPerTick >= minContributionPerTick) {
             revert InvalidAmountToPayPerTick();
         }
-        if (_orderSizeInTicks > MAX_TICKS) {
+        if (_orderSizeInTicks < MAX_TICKS) {
             revert GiantOrder();
         }
 
