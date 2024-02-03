@@ -163,6 +163,10 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         sendMessage(currentOrder);
     }
 
+    function futureRevenueCertificate(address _frCertificate) external {
+        frCertificate = _frCertificate;
+    }
+
     /*//////////////////////////////////////////////////////////////
                               TELEPORTER LOGIC
     //////////////////////////////////////////////////////////////*/
