@@ -18,6 +18,7 @@ error OngoingAuction();
 error ExhaustedOrder();
 error GiantOrder();
 error EmptyAuction();
+error NotWinner();
 
 contract AuctionHouse is Ownable, IAuctionHouse {
     using StructuredLinkedList for StructuredLinkedList.List;
@@ -133,7 +134,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         return newOrderId;
     }
 
-    function settleAuction() external {
+    function settleOrder(uint256 orderId) external {
         if (expiration <= block.timestamp) {
             revert OngoingAuction();
         }
@@ -147,11 +148,8 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         uint256 currentOrderId = list.popFront();
         Order memory currentOrder = orders[currentOrderId];
 
-        while (hasNext) {
-            if (ticksConsumed + currentOrder.orderSizeInTicks > MAX_TICKS) break;
-
+        while (hasNext && currentOrder != orderId) {
             ticksConsumed += currentOrder.orderSizeInTicks;
-            sendOrderThroughTeleporter(currentOrder);
 
             (bool hasNextNode, uint256 nextNode) = list.getNextNode(currentOrderId);
 
@@ -159,10 +157,12 @@ contract AuctionHouse is Ownable, IAuctionHouse {
             currentOrderId = nextNode;
             currentOrder = orders[nextNode];
         }
-    }
 
-    function sendOrderThroughTeleporter(Order memory order) internal {
-        //send through teleporter
+        if (ticksConsumed + currentOrder.orderSizeInTicks > MAX_TICKS) {
+            revert NotWinner();
+        }
+
+        sendMessage(order);
     }
 
     /*//////////////////////////////////////////////////////////////
