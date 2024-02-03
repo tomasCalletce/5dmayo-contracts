@@ -58,9 +58,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    constructor(uint256 _minContributionPerTick, uint256 _minTicksPerOrder, uint256 _expiration, address _owner)
-        Ownable(_owner)
-    {
+    constructor(uint256 _minContributionPerTick, uint256 _minTicksPerOrder, uint256 _expiration) {
         if (_expiration < block.timestamp) {
             revert InValidExpiration();
         }

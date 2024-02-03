@@ -4,5 +4,5 @@ pragma solidity 0.8.18;
 import {ERC721} from "@openzeppelin/token/ERC721/ERC721.sol";
 
 contract FRcertificate is ERC721 {
-    constructor() ERC721("MyToken", "MTK") {}
+    constructor() ERC721("FRcertificate", "FRC") {}
 }
