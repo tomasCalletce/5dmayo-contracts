@@ -41,10 +41,12 @@ contract FRcertificate is ERC721 {
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    constructor(address _auctionHouse, address _settlementAddress) ERC721("FRcertificate", "FRC") {
+    constructor(address _auctionHouse, address _settlementAddress, uint256 _settlementDate)
+        ERC721("FRcertificate", "FRC")
+    {
         settlementAddress = IERC20(_settlementAddress);
         auctionHouse = _auctionHouse;
-        settlementDate = _settlementAddress;
+        settlementDate = _settlementDate;
     }
 
     /*//////////////////////////////////////////////////////////////
