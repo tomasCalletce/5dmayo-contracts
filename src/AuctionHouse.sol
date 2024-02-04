@@ -139,34 +139,25 @@ contract AuctionHouse is Ownable, IAuctionHouse {
     }
 
     function settleOrder(uint256 orderId) external {
-        if (expiration <= block.timestamp) {
-            revert OngoingAuction();
-        }
-        if (!list.listExists()) {
-            revert EmptyAuction();
-        }
+        if (expiration <= block.timestamp) revert OngoingAuction();
+        if (!list.listExists()) revert EmptyAuction();
 
         uint256 ticksConsumed = 0;
-        bool hasNext = true;
-
         uint256 currentOrderId = listHead;
-        Order memory currentOrder = orders[currentOrderId];
 
-        while (hasNext && currentOrderId != orderId) {
+        while (currentOrderId != orderId) {
+            Order memory currentOrder = orders[currentOrderId];
             ticksConsumed += currentOrder.orderSizeInTicks;
 
-            (bool hasNextNode, uint256 nextNode) = list.getNextNode(currentOrderId);
+            (bool hasNext, uint256 nextNode) = list.getNextNode(currentOrderId);
+            if (!hasNext) break;
 
-            hasNext = hasNextNode;
             currentOrderId = nextNode;
-            currentOrder = orders[nextNode];
         }
 
-        if (ticksConsumed + currentOrder.orderSizeInTicks > MAX_TICKS) {
-            revert NotWinner();
-        }
+        if (ticksConsumed + orders[orderId].orderSizeInTicks > MAX_TICKS) revert NotWinner();
 
-        sendMessage(currentOrder, orderId);
+        sendMessage(orders[orderId], orderId);
     }
 
     function constructList() external view returns (Order[] memory) {
