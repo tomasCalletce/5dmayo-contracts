@@ -19,6 +19,7 @@ contract FRcertificate is ERC721 {
     }
 
     mapping(uint256 => Position) public positions;
+    mapping(address => uint256[]) public ids;
 
     /*//////////////////////////////////////////////////////////////
                                  CONSTANTS
@@ -67,6 +68,8 @@ contract FRcertificate is ERC721 {
         // );
 
         _mint(order.receiver, orderId);
+
+        ids[order.receiver].push(orderId);
 
         Position memory newPosition =
             Position({amountToPayPerTick: order.amountToPayPerTick, orderSizeInTicks: order.orderSizeInTicks});
