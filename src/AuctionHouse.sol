@@ -42,7 +42,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
 
     uint256 public immutable minContributionPerTick;
     uint256 public immutable minTicksPerOrder;
-    uint256 public immutable expiration;
+    uint256 public expiration;
 
     uint256 public listHead;
 
@@ -187,8 +187,12 @@ contract AuctionHouse is Ownable, IAuctionHouse {
         return ordersList;
     }
 
-    function futureRevenueCertificate(address _frCertificate) external {
+    function setFrCertificate(address _frCertificate) external {
         frCertificate = _frCertificate;
+    }
+
+    function setExpiration(uint256 _expiration) external {
+        expiration = _expiration;
     }
 
     /*//////////////////////////////////////////////////////////////
