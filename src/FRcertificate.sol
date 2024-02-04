@@ -35,13 +35,16 @@ contract FRcertificate is ERC721 {
 
     address public auctionHouse;
 
+    uint256 settlementDate;
+
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
     constructor(address _auctionHouse, address _settlementAddress) ERC721("FRcertificate", "FRC") {
-        auctionHouse = _auctionHouse;
         settlementAddress = IERC20(_settlementAddress);
+        auctionHouse = _auctionHouse;
+        settlementDate = _settlementAddress;
     }
 
     /*//////////////////////////////////////////////////////////////
