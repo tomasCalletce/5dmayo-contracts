@@ -23,10 +23,6 @@ contract FRcertificate is ERC721 {
     function receiveTeleporterMessage(bytes32 originChainID, address originSenderAddress, bytes calldata message)
         external
     {
-        if (originSenderAddress != auctionHouse) {
-            revert Unauthorized();
-        }
-
         (IAuctionHouse.Order memory order, uint256 orderId) = abi.decode(message, (IAuctionHouse.Order, uint256));
 
         // settlementAddress.safeTransferFrom(

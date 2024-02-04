@@ -48,7 +48,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
 
     address public frCertificate;
 
-    mapping(uint256 => Order) private orders;
+    mapping(uint256 => Order) public orders;
     uint256 progressiveOrderId;
 
     StructuredLinkedList.List private list;
