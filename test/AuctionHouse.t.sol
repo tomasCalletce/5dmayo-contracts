@@ -3,7 +3,6 @@ pragma solidity 0.8.18;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {AuctionHouse} from "../src/AuctionHouse.sol";
-import {}
 
 contract AuctionHouseTest is Test {
     AuctionHouse public auctionHouse;
@@ -25,8 +24,5 @@ contract AuctionHouseTest is Test {
         });
 
         uint256 listHead = auctionHouse.listHead();
-
-    
-        console2.log(listHead);
     }
 }

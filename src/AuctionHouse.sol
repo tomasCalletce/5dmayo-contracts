@@ -170,24 +170,27 @@ contract AuctionHouse is Ownable, IAuctionHouse {
     }
 
     function constructList() external view returns (Order[] memory) {
-        Order[] memory ordersList = new Order[](list.sizeOf());
+        uint256 listSize = list.sizeOf();
+        Order[] memory ordersList = new Order[](listSize);
 
-        bool hasNext = true;
+        if (listSize == 0) {
+            return ordersList;
+        }
+
         uint256 counter = 0;
-
         uint256 currentOrderId = listHead;
-        Order memory currentOrder = orders[currentOrderId];
 
-        while (hasNext) {
-            ordersList[counter] = currentOrder;
+        while (counter < listSize) {
+            Order memory currentOrder = orders[currentOrderId];
+            ordersList[counter++] = currentOrder;
 
-            (bool hasNextNode, uint256 nextNode) = list.getNextNode(currentOrderId);
+            (bool hasNext, uint256 nextNode) = list.getNextNode(currentOrderId);
 
-            hasNext = hasNextNode;
+            if (!hasNext) {
+                break;
+            }
+
             currentOrderId = nextNode;
-            currentOrder = orders[nextNode];
-
-            counter++;
         }
 
         return ordersList;

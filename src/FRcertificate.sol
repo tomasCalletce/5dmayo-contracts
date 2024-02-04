@@ -29,9 +29,9 @@ contract FRcertificate is ERC721 {
 
         (IAuctionHouse.Order memory order, uint256 orderId) = abi.decode(message, (IAuctionHouse.Order, uint256));
 
-        settlementAddress.safeTransferFrom(
-            order.receiver, address(this), order.amountToPayPerTick * order.orderSizeInTicks
-        );
+        // settlementAddress.safeTransferFrom(
+        //     order.receiver, address(this), order.amountToPayPerTick * order.orderSizeInTicks
+        // );
 
         _mint(order.receiver, orderId);
     }
