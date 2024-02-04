@@ -44,7 +44,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
     uint256 public immutable minTicksPerOrder;
     uint256 public immutable expiration;
 
-    uint256 listHead;
+    uint256 public listHead;
 
     address public frCertificate;
 
@@ -91,7 +91,7 @@ contract AuctionHouse is Ownable, IAuctionHouse {
             revert GiantOrder();
         }
 
-        uint256 newOrderId = progressiveOrderId++;
+        uint256 newOrderId = ++progressiveOrderId;
         Order memory newOrder =
             Order({amountToPayPerTick: _amountToPayPerTick, orderSizeInTicks: _orderSizeInTicks, receiver: _receiver});
 
